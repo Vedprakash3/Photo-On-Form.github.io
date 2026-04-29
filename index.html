@@ -5,30 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Preview Form with Photo</title>
     <style>
+        body {
+            background-color: #FFFFE0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
         /* Styling for mobile-friendly canvas */
         #canvasContainer {
             width: 100%;
-            max-width: 600px; /* Larger max width for form layout */
+            max-width: 600px;
             margin: auto;
             position: relative;
             border: 1px solid #ddd;
+            background-color: white;
         }
+
         #canvas {
             width: 100%;
         }
+
         #draggablePhoto {
             position: absolute;
-            width: 80px; /* Passport size photo width */
-            height: 100px; /* Passport size photo height */
+            width: 80px;
+            height: 100px;
             cursor: move;
             border: 2px solid #666;
             border-radius: 8px;
             overflow: hidden;
         }
+
         #draggablePhoto img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -41,27 +57,22 @@
     <br><br>
 
     <div id="canvasContainer">
-        <!-- Canvas for Form image -->
         <canvas id="canvas"></canvas>
         
-        <!-- Photo element to place in grid positions -->
         <div id="draggablePhoto" style="display:none;">
             <img id="photoImage" alt="Photo">
         </div>
     </div>
 
     <br>
-    <!-- Button to download the PDF -->
     <button onclick="downloadPDF()">Download PDF</button>
 
-    <!-- Include the jsPDF and html2canvas libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
     <script>
         let formImage = null;
 
-        // Load Form Image
         document.getElementById('formImageUpload').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -77,7 +88,6 @@
             }
         });
 
-        // Load and Display User Photo
         document.getElementById('photoUpload').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -85,8 +95,6 @@
                 reader.onload = function(e) {
                     document.getElementById('photoImage').src = e.target.result;
                     document.getElementById('draggablePhoto').style.display = 'block';
-                    
-                    // Set initial position for the photo
                     setPosition(100, 100);
                 };
                 reader.readAsDataURL(file);
@@ -95,7 +103,6 @@
             }
         });
 
-        // Function to draw Form image on canvas
         function drawFormImage() {
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
@@ -104,20 +111,17 @@
             ctx.drawImage(formImage, 0, 0);
         }
 
-        // Function to set the photo's initial position
         function setPosition(x, y) {
             const draggablePhoto = document.getElementById('draggablePhoto');
             draggablePhoto.style.left = `${x}px`;
             draggablePhoto.style.top = `${y}px`;
         }
 
-        // Make the photo draggable using mouse/touch
         let isDragging = false;
         let offsetX, offsetY;
 
         const draggablePhoto = document.getElementById('draggablePhoto');
 
-        // Handle mouse/touch start for dragging
         draggablePhoto.addEventListener('mousedown', startDrag);
         draggablePhoto.addEventListener('touchstart', startDrag);
 
@@ -133,7 +137,6 @@
             }
         }
 
-        // Handle mouse/touch move for dragging
         document.addEventListener('mousemove', dragPhoto);
         document.addEventListener('touchmove', dragPhoto);
 
@@ -145,18 +148,15 @@
             draggablePhoto.style.top = `${clientY - offsetY}px`;
         }
 
-        // Handle mouse/touch end for drag stop
         document.addEventListener('mouseup', () => isDragging = false);
         document.addEventListener('touchend', () => isDragging = false);
 
-        // Function to download the canvas and photo as PDF
         function downloadPDF() {
             html2canvas(document.getElementById('canvasContainer')).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF();
 
-                // Fit image within PDF page
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
